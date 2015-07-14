@@ -9,7 +9,7 @@ app.init = function(){
   $('#send').on('submit', app.handleSubmit);
 
 
-  setInterval(app.fetch(app.displayMessages), 1000);
+  setInterval(app.fetch(app.displayMessages), 5000);
   app.fetch(app.displayMessages);
 };
 
@@ -102,7 +102,7 @@ app.handleSubmit = function(event){
 };
 
 app.displayMessages = function(messages){
-  for(var i=0; i<messages.length; i++){
+  for(var i=messages.length-1; i>0; i--){
     app.addMessage(messages[i]);
   }
 };
