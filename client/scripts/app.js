@@ -3,13 +3,16 @@ var app = {};
 
 app.server = 'https://api.parse.com/1/classes/chatterbox';
 app.friends = [];
+app.currentRoom = 'lobby';
 
 app.init = function(){
-  //$('#send .submit').on('submit', app.handleSubmit);
   $('#send').on('submit', app.handleSubmit);
+  $('#roomSelect').on('change', app.handleRoomSelect);
 
+  setInterval(function(){
+    app.fetch(app.displayMessages)
+  }, 5000);
 
-  setInterval(app.fetch(app.displayMessages), 5000);
   app.fetch(app.displayMessages);
 };
 
@@ -30,7 +33,8 @@ app.send = function(message) {
 };
 
 app.fetch = function (callback) {
-  var response = $.ajax({
+  //console.log('fetching...');
+  $.ajax({
     url: app.server,
     type: 'GET',
     contentType: 'application/JSON',
@@ -47,6 +51,7 @@ app.fetch = function (callback) {
 
 app.clearMessages = function(){
   $('#chats').empty();
+  //console.log("I should be cleaning");
 };
 
 app.addMessage = function(message){
@@ -72,14 +77,14 @@ app.addFriend = function(username){
   if(!_.contains(app.friends, username)){
     app.friends.push(username);
   }
-  console.log(app.friends);
+  //console.log(app.friends);
 };
 
 app.handleSubmit = function(event){
   event.preventDefault();
 
   var username = window.location.search;
-  console.log(username.indexOf('username='));
+  //console.log(username.indexOf('username='));
   username = username.substr(username.indexOf('username=') + 9);
   if(username.indexOf('&') > -1){
     username = username.substr(0, username.indexOf('&'));
@@ -91,37 +96,61 @@ app.handleSubmit = function(event){
   var $form = $(this);
   var messagetext = $form.find( "input[name='message']" ).val(); // colon in front of input????
 
+  if($('#roomSelect').val() === "lobby") {
+    roomname = '';
+  } else {
+    roomname = $('#roomSelect').val();
+  }
+
   var message = {
     username: username,
     text: messagetext,
-    roomname: ''
+    roomname: roomname
   };
 
   app.send(message);
   return false;
 };
 
-app.displayMessages = function(messages){
+app.displayMessages = function(messages, roomName){
   for(var i=messages.length-1; i>0; i--){
-    app.addMessage(messages[i]);
+    //console.log(messages[i].roomname + " : " + app.currentRoom);
+    if (messages[i].roomname === app.currentRoom || app.currentRoom === "lobby") {
+      app.addMessage(messages[i]);
+    }
   }
 };
 
-// var displayMessages = function(messages) {
-//   var $messageElement = $('#messages');
+app.handleRoomSelect = function(){
+  var $room = $('#roomSelect').val();
 
-//   for (var i = 0; i < messages.length; i++) {
-//     if ($('.' + messages[i].objectId).length === 0) {
+  if ($room === "newRoom") {
+    var roomName = prompt("Provide a room name.");
+    $room = roomName;
+    app.addRoom(roomName);
+    app.showRoom(roomName);
+    $('#roomSelect').val(roomName);
+  } else if($room === "lobby"){
+    app.fetch(app.displayMessages);
+  }else {
+    app.showRoom($room);
+  }
+  app.currentRoom = $room;
+};
 
-//       var $userName = $('<span></span>').text(messages[i].username + ": ").addClass('username');
-//       var $messageText = $('<span></span>').text(messages[i].text);
-//       var $element = $('<div></div>').append($userName).append($messageText).addClass(messages[i].objectId).addClass('chat');
+app.showRoom = function(roomName) {
+  app.clearMessages();
+  app.fetch(function(messages){
+    app.displayMessages(messages, roomName);
+  });
+};
 
-//       $messageElement.prepend($element);
-//     }
-//   }
-// };
 
-// //setInterval(loadMessages, 5000);
-// //loadMessages();
+
+
+
+
+
+
+
 
