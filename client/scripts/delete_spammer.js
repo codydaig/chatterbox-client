@@ -43,5 +43,5 @@ var handle = function(messages) {
   //setTimeout(takedown, 100);
 };
 
-takedown();
+// takedown();
 //setInterval(takedown, 1000);

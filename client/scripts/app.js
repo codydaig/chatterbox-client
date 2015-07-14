@@ -3,6 +3,7 @@ var app = {};
 
 app.server = 'https://api.parse.com/1/classes/chatterbox';
 app.friends = [];
+app.rooms = ['newRoom', 'lobby'];
 app.currentRoom = 'lobby';
 
 app.init = function(){
@@ -58,11 +59,26 @@ app.addMessage = function(message){
   if ($('.' + message.objectId).length === 0) {
     var $messageElement = $('#chats');
     var $userName = $('<span></span>').text(message.username + ": ").addClass('username');
+
+    // Initialize event handler for friend requests
     $userName.on('click', function(){
       app.addFriend(message.username);
     });
-    var $messageText = $('<span></span>').text(message.text);
+
+    var roomName = message.roomname;
+    if (app.rooms.indexOf(roomName) === -1 && (roomName !== undefined) && roomName !== '') {
+      app.addRoom(roomName);
+    }
+
+    if(app.friends.indexOf(message.username) > -1) {
+      var $text = $('<strong></strong>').text(message.text);
+      var $messageText = $('<span></span>').append($text);
+    } else {
+      var $messageText = $('<span></span>').text(message.text);
+    }
     var $element = $('<div></div>').append($userName).append($messageText).addClass(message.objectId).addClass('chat');
+
+
 
     $messageElement.prepend($element);
   }
@@ -71,6 +87,7 @@ app.addMessage = function(message){
 app.addRoom = function(roomName){
   var $newRoom = $('<option></option>').val(roomName).text(roomName);
   $('#roomSelect').append($newRoom);
+  app.rooms.push(roomName);
 };
 
 app.addFriend = function(username){
@@ -90,7 +107,7 @@ app.handleSubmit = function(event){
     username = username.substr(0, username.indexOf('&'));
   }
   if(!username) {
-    username = 'anonynmous';
+    username = 'anonymous';
   }
 
   var $form = $(this);
