@@ -65,11 +65,13 @@ app.addMessage = function(message){
       app.addFriend(message.username);
     });
 
+    // Add room name to dropdown menu if it doesn't already exist, or is undefined/empty
     var roomName = message.roomname;
     if (app.rooms.indexOf(roomName) === -1 && (roomName !== undefined) && roomName !== '') {
       app.addRoom(roomName);
     }
 
+    // Bold text if username is a 'friend'
     if(app.friends.indexOf(message.username) > -1) {
       var $text = $('<strong></strong>').text(message.text);
       var $messageText = $('<span></span>').append($text);
@@ -77,9 +79,7 @@ app.addMessage = function(message){
       var $messageText = $('<span></span>').text(message.text);
     }
     var $element = $('<div></div>').append($userName).append($messageText).addClass(message.objectId).addClass('chat');
-
-
-
+    
     $messageElement.prepend($element);
   }
 };
@@ -94,14 +94,12 @@ app.addFriend = function(username){
   if(!_.contains(app.friends, username)){
     app.friends.push(username);
   }
-  //console.log(app.friends);
 };
 
 app.handleSubmit = function(event){
   event.preventDefault();
 
   var username = window.location.search;
-  //console.log(username.indexOf('username='));
   username = username.substr(username.indexOf('username=') + 9);
   if(username.indexOf('&') > -1){
     username = username.substr(0, username.indexOf('&'));
@@ -131,7 +129,6 @@ app.handleSubmit = function(event){
 
 app.displayMessages = function(messages, roomName){
   for(var i=messages.length-1; i>0; i--){
-    //console.log(messages[i].roomname + " : " + app.currentRoom);
     if (messages[i].roomname === app.currentRoom || app.currentRoom === "lobby") {
       app.addMessage(messages[i]);
     }

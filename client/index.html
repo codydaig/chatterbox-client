@@ -14,8 +14,10 @@
           <option value="lobby" selected>Lobby</option>
       </select>
 
-      <form id="send">
-        <input type="text" name="message" placeholder="Enter your message here.." />
+      <div class="spinner"><img src="images/spiffygif_46x46.gif"></div>
+
+      <form action="#" id="send" method="post">
+        <input type="text" name="message" id="text" placeholder="Enter your message here.." />
         <input type="submit" class="submit" name="submit" value="Send" />
       </form>
 
@@ -25,13 +27,24 @@
     <!-- dependencies -->
     <script src="bower_components/jquery/jquery.min.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/backbone/backbone-min.js"></script>
+
     <!-- your scripts -->
-    <script src="env/config.js"></script>
+    <!-- Previous version
     <script src="scripts/app.js"></script>
-    <script src="scripts/delete_spammer.js"></script>
+    <script src="scripts/delete_spammer.js"></script> 
+    -->
+    <script src="env/config.js"></script>
+    <script src="scripts/appBackbone.js"></script>
 
     <script>
-    app.init();
+      $(function(){
+          var messages = new Messages();
+          messages.loadMsgs();
+          var formView = new FormView({el: $('#main'), collection: messages})
+          var messagesView = new MessagesView({el: $('#chats'), collection: messages});
+          setInterval( messages.loadMsgs.bind(messages), 1000 );
+        });
     </script>
   </body>
 </html>
